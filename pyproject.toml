@@ -14,6 +14,7 @@ dependencies = [
   "rich>=13.7",
   "typer>=0.12",
   "langgraph>=0.3.0",
+  "python-dotenv>=1.0.1",
 ]
 
 [project.optional-dependencies]
@@ -22,6 +23,7 @@ dev = [
   "pytest-cov>=5.0",
   "ruff>=0.5.0",
   "mypy>=1.10",
+  "types-PyYAML>=6.0",
 ]
 google = ["langchain-google-genai>=2.1.0"]
 openai = ["langchain-openai>=0.3.0"]
@@ -41,9 +43,18 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "N", "ANN"]
-ignore = ["ANN101", "ANN102"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*.py" = ["ANN", "E402", "E501", "F401"]
+"src/langgraph_agent_lab/graph.py" = ["ANN401"]
+"src/langgraph_agent_lab/llm.py" = ["ANN401"]
+"src/langgraph_agent_lab/persistence.py" = ["ANN401"]
+"src/langgraph_agent_lab/state.py" = ["ANN401"]
 
 [tool.pytest.ini_options]
 minversion = "8.0"
 addopts = "-q --strict-markers"
 testpaths = ["tests"]
+
+[tool.mypy]
+ignore_missing_imports = true

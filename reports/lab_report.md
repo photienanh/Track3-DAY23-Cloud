@@ -4,11 +4,11 @@
 
 | Thành viên | Họ và tên | Mã sinh viên | Công việc được phân công |
 |---:|---|---|---|
-| 1 | Phạm Tiến Anh | 2A202601549 | State, reducer, intake và phân loại |
-| 2 | Hà Nhật Khánh Duy | 2A202602031 | Tool, đánh giá, retry và dead letter |
-| 3 | Phó Viết Tiến Anh | 2A202601341 | Hành động rủi ro, approval/HITL và làm rõ yêu cầu |
-| 4 | Ngô Quang Dũng | 2A202601819 | Nối graph, persistence và recovery |
-| 5 | Lâm Việt Hoàng | 2A202601067 | Metrics, kiểm thử, tài liệu và demo |
+| 1 | Phạm Tiến Anh | 2A202601549 | Typed state, reducer và tích hợp LLM/OpenAI |
+| 2 | Hà Nhật Khánh Duy | 2A202602031 | Các workflow node và xử lý retry/approval |
+| 3 | Phó Viết Tiến Anh | 2A202601341 | Conditional routing và nối StateGraph |
+| 4 | Ngô Quang Dũng | 2A202601819 | Persistence, checkpointer và CLI runner |
+| 5 | Lâm Việt Hoàng | 2A202601067 | Metrics, scenario loader và báo cáo |
 
 - Repository/commit: https://github.com/photienanh/Track3-DAY23-Cloud
 - Ngày thực hiện: 25/08/2026
@@ -85,10 +85,12 @@ Mỗi scenario nhận một `thread_id` ổn định và được truyền dư�
 xác minh `get_state_history()` trên cùng thread sau khi chạy và chỉ đặt `resume_success` khi mọi run
 đều trả về history. MemorySaver chứng minh khả năng replay trong cùng process. Khi được cấu hình,
 SQLite adapter sử dụng thêm `SqliteSaver` và WAL mode để lưu checkpoint bền vững.
+Kiểm thử persistence ghi checkpoint, đóng connection, mở lại database và xác nhận state cùng
+history vẫn đọc được.
 
 ## 7. Phần mở rộng đã thực hiện
 
-- SQLite checkpointer adapter với WAL mode.
+- SQLite checkpointer adapter với WAL mode và kiểm thử recovery sau khi mở lại database.
 - HITL thật tùy chọn qua `LANGGRAPH_INTERRUPT=true`; mock approval vẫn là mặc định cho CI.
 - Đo độ trễ runtime và xác minh state-history metrics.
 - Cơ chế xử lý lỗi LLM có thể kiểm toán.
