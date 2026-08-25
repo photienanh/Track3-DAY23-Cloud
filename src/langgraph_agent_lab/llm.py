@@ -12,9 +12,16 @@ Usage in nodes:
 from __future__ import annotations
 
 import os
+from typing import Any
+
+from dotenv import load_dotenv
+
+# A .env file is inert until it is loaded. Do this once at module import, before
+# selecting a provider, and never print any of the values.
+load_dotenv()
 
 
-def get_llm(model: str | None = None, temperature: float = 0.0):
+def get_llm(model: str | None = None, temperature: float = 0.0) -> Any:
     """Create an LLM client from environment configuration.
 
     Checks for API keys in this order:
@@ -41,7 +48,7 @@ def get_llm(model: str | None = None, temperature: float = 0.0):
         except ImportError as exc:
             raise RuntimeError("Install: pip install langchain-openai") from exc
         return ChatOpenAI(
-            model=model or os.getenv("LLM_MODEL", "gpt-4o-mini"),
+            model=model or os.getenv("LLM_MODEL") or "gpt-4o-mini",
             temperature=temperature,
         )
 
