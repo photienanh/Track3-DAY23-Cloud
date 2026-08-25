@@ -1,34 +1,4 @@
-"""Report generation helper using the lab report template."""
-
-from __future__ import annotations
-
-from pathlib import Path
-
-from .metrics import MetricsReport
-
-
-def render_report(metrics: MetricsReport) -> str:
-    """Render a complete lab report from metrics data.
-
-    Generate a report that includes:
-    1. Metrics summary table (total scenarios, success rate, retries, interrupts)
-    2. Per-scenario results table
-    3. Architecture explanation (your graph design, state schema, reducers)
-    4. Failure analysis (at least two failure modes you considered)
-    5. Improvement plan
-
-    Use reports/lab_report_template.md as your guide.
-
-    Return: formatted markdown string
-    """
-    rows = "\n".join(
-        f"| {item.scenario_id} | {item.expected_route} | {item.actual_route or '-'} | "
-        f"{'Có' if item.success else 'Không'} | {item.retry_count} | "
-        f"{item.interrupt_count} | {item.latency_ms} |"
-        for item in metrics.scenario_metrics
-    )
-    replay = "Có" if metrics.resume_success else "Không"
-    return f"""# Báo cáo bài lab Day 08
+# Báo cáo bài lab Day 08
 
 ## 1. Nhóm / sinh viên
 
@@ -40,8 +10,8 @@ def render_report(metrics: MetricsReport) -> str:
 | 4 | Ngô Quang Dũng | 2A202601819 | Nối graph, persistence và recovery |
 | 5 | Lâm Việt Hoàng | 2A202601067 | Metrics, kiểm thử, tài liệu và demo |
 
-- Repository/commit: *(điền sau)*
-- Ngày thực hiện: *(điền sau)*
+- Repository/commit: https://github.com/photienanh/Track3-DAY23-Cloud
+- Ngày thực hiện: 25/08/2026
 
 ## 2. Kiến trúc
 
@@ -75,16 +45,22 @@ error > simple`. Câu trả lời được LLM sinh dựa trên query, kết qu�
 
 | Chỉ số | Giá trị |
 |---|---:|
-| Tổng số scenario | {metrics.total_scenarios} |
-| Tỷ lệ thành công | {metrics.success_rate:.2%} |
-| Số node event trung bình | {metrics.avg_nodes_visited:.2f} |
-| Tổng số lần retry | {metrics.total_retries} |
-| Số lần đi qua approval | {metrics.total_interrupts} |
-| Đã xác minh đọc lại state history | {replay} |
+| Tổng số scenario | 7 |
+| Tỷ lệ thành công | 100.00% |
+| Số node event trung bình | 6.43 |
+| Tổng số lần retry | 3 |
+| Số lần đi qua approval | 2 |
+| Đã xác minh đọc lại state history | Có |
 
 | Scenario | Route kỳ vọng | Route thực tế | Thành công | Retry | Lần qua approval | Độ trễ (ms) |
 |---|---|---|---:|---:|---:|---:|
-{rows}
+| S01_simple | simple | simple | Có | 0 | 0 | 3907 |
+| S02_tool | tool | tool | Có | 0 | 0 | 2285 |
+| S03_missing | missing_info | missing_info | Có | 0 | 0 | 1138 |
+| S04_risky | risky | risky | Có | 0 | 1 | 2337 |
+| S05_error | error | error | Có | 2 | 0 | 2051 |
+| S06_delete | risky | risky | Có | 0 | 1 | 1626 |
+| S07_dead_letter | error | error | Có | 1 | 0 | 1470 |
 
 Số lần qua approval được tính từ event của node `approval`; mock reviewer mặc định không đồng nghĩa
 workflow đã thật sự tạm dừng. Độ trễ được đo quanh mỗi lần gọi graph.
@@ -122,11 +98,3 @@ SQLite adapter sử dụng thêm `SqliteSaver` và WAL mode để lưu checkpoin
 Ưu tiên đầu tiên là thay mock tool và reviewer bằng service call có xác thực, idempotency và cơ chế
 phê duyệt bền vững. Sau đó bổ sung backoff policy có kiểu, tracing/cost budget, che dữ liệu PII,
 hiệu chỉnh evaluator và kiểm thử recovery qua nhiều process.
-"""
-
-
-def write_report(metrics: MetricsReport, output_path: str | Path) -> None:
-    """Write the rendered report to a file."""
-    path = Path(output_path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(render_report(metrics), encoding="utf-8")
